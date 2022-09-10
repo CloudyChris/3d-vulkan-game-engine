@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# The dist folder
+dist/
+dist/*
+
+# ccls
+
+.ccls
