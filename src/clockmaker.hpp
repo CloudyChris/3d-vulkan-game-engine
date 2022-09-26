@@ -8,6 +8,7 @@ class Clockmaker
 {
 public:
 	Clockmaker();
+	~Clockmaker();
 	void Init();
 	void MainLoop();
 	void Cleanup();

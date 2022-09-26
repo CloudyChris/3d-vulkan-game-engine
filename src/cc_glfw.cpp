@@ -22,7 +22,7 @@ void CC_WindowManager::InitWindow()
 	if( !myWindow )
 	{
         glfwTerminate();
-        exit( EXIT_FAILURE );
+        exit(EXIT_FAILURE);
     }
 
 	glfwMakeContextCurrent( myWindow );
@@ -45,7 +45,7 @@ GLFWwindow* CC_WindowManager::GetWindow()
 
 void CC_WindowManager::Cleanup()
 {
-	glfwDestroyWindow( myWindow );
+	glfwDestroyWindow(myWindow);
     glfwTerminate();
 
 #if RUNMODE == 1

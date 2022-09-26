@@ -20,5 +20,7 @@ int main()
 		return -1;
 	}
 
+	delete clockmaker;
+
 	return 0;
 }

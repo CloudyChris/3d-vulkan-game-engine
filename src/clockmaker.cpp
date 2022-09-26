@@ -7,6 +7,12 @@ Clockmaker::Clockmaker()
 	, myVulkanManager(new CC_Vulkan(*this))
 {}
 
+Clockmaker::~Clockmaker()
+{
+	delete myWindowManager;
+	delete myVulkanManager;
+}
+
 void Clockmaker::Init()
 {
 	myWindowManager->InitWindow();
