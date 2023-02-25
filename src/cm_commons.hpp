@@ -44,9 +44,9 @@
 #include <set>
 #pragma endregion
 
-#pragma region WB_LIBS
+#pragma region CM_LIBS
 //[]==================================[]
-//||        WINCH-BOX INCLUDES        ||
+//||        CLOCKMAKER INCLUDES       ||
 //[]==================================[]
 #include "cm_types.hpp"
 #include "cm_math.hpp"
