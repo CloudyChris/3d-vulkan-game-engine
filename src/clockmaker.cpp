@@ -25,23 +25,17 @@ void Clockmaker::MainLoop()
 	{
 		myWindowManager->PollEvents();
 	}
-#if RUNMODE == 1
-	std::cout << "Exiting MainLoop" << std::endl;
-#endif
+	CC_STAT(CC_STAT_OK, "Exiting MainLoop");
 }
 
 void Clockmaker::Cleanup()
 {
-#if RUNMODE == 1
-	std::cout << "Starting cleanup" << std::endl;
-#endif
+	CC_STAT(CC_STAT_LOAD, "Starting cleanup");
 
 	myVulkanManager->Cleanup();
 	myWindowManager->Cleanup();
 
-#if RUNMODE == 1
-	std::cout << "Finished cleanup" << std::endl;
-#endif
+	CC_STAT(CC_STAT_OK, "Finished cleanup");
 }
 
 CC_WindowManager& Clockmaker::GetWindowManager()

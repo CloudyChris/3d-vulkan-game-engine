@@ -29,8 +29,6 @@
 #define VK_REQUIRE_EXTENSION_SWAPCHAIN
 #pragma endregion
 
-#include "cc_vector.hpp"
-#include "cc_matrix.hpp"
 #include "cc_glfw.hpp"
 #include "cc_vulkan.hpp"
 #include "clockmaker.hpp"

@@ -6,5 +6,5 @@
 
 inline int ExpSign(int x)
 {
-	return ((bool)(x % 2) ? -1 : 1);
+	return (bool)(x % 2) ? -1 : 1;
 }

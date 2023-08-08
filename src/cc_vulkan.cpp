@@ -2,6 +2,7 @@
 
 #include "cm_precompile.hpp"
 #include "cc_vulkan.hpp"
+#include "cm_types.hpp"
 
 CC_Vulkan::CC_Vulkan(Clockmaker& aClockmakerInstance)
 	: theClockmaker(aClockmakerInstance)
@@ -29,6 +30,7 @@ void CC_Vulkan::InitVulkan()
 	CreateLogicalDevice();
 	CreateSwapChain();
 	CreateImageViews();
+  CreateGraphicsPipeline();
 }
 
 void CC_Vulkan::CreateInstance()
@@ -60,9 +62,7 @@ void CC_Vulkan::CreateInstance()
 	{
 		throw std::runtime_error("[ VkError ] Failed to create Vulkan instance");
 	}
-#if RUNMODE == 1	
-	std::cout << "VkInstance created" << std::endl;
-#endif
+	CC_DEBUG("VkInstance created");
 }
 
 void CC_Vulkan::CreateLogicalDevice()
@@ -107,21 +107,15 @@ void CC_Vulkan::CreateLogicalDevice()
 		throw std::runtime_error("[ VkError ]Failed to create logical device");
 	}
 
-#if RUNMODE == 1
-	std::cout << "Created logical device" << std::endl;
-#endif
+	CC_DEBUG("Created logical device");
 
 	vkGetDeviceQueue(myLogicalDevice, indices.graphicsFamily.value(), 0, &myGraphicsQueue);
 
-#if RUNMODE == 1
-	std::cout << "Extracted graphics queue" << std::endl;
-#endif
+	CC_DEBUG("Extracted graphics queue");
 
 	vkGetDeviceQueue(myLogicalDevice, indices.presentFamily.value(), 0, &myPresentQueue);
 
-#if RUNMODE == 1
-	std::cout << "Extracted present queue" << std::endl;
-#endif
+	CC_DEBUG("Extracted present queue");
 }
 
 void CC_Vulkan::CreateSwapChain()
@@ -181,25 +175,19 @@ void CC_Vulkan::CreateSwapChain()
 		throw std::runtime_error("[ VkError ] Failed to create swap chain");
 	}
 
-#if RUNMODE == 1
-	std::cout << "Created swap chain" << std::endl;
-#endif
+	CC_DEBUG("Created swap chain");
 
 	vkGetSwapchainImagesKHR(myLogicalDevice, mySwapChain, &imageCount, nullptr);
 
 	mySwapChainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(myLogicalDevice, mySwapChain, &imageCount, mySwapChainImages.data());
 
-#if RUNMODE == 1
-	std::cout << "Retrieved swap chain images" << std::endl;
-#endif
+	CC_DEBUG("Retrieved swap chain images");
 
 	mySwapChainImageFormat = surfaceFormat.format;
 	mySwapChainExtent = extent;
 
-#if RUNMODE == 1
-	std::cout << "Saved swap chain format and extent" << std::endl;
-#endif
+	CC_DEBUG("Saved swap chain format and extent");
 }
 
 void CC_Vulkan::CreateImageViews()
@@ -232,9 +220,7 @@ void CC_Vulkan::CreateImageViews()
 			throw std::runtime_error("[ VkError ] Failed to create image views");
 		}
 	}
-#if RUNMODE == 1
-	std::cout << "Created image views" << std::endl;
-#endif
+	CC_DEBUG("Created image views");
 }
 
 void CC_Vulkan::CreateSurface()
@@ -246,9 +232,12 @@ void CC_Vulkan::CreateSurface()
 		throw std::runtime_error("[ VkError ] Failed to create window surface");
 	}
 
-#if RUNMODE == 1
-	std::cout << "Created window surface" << std::endl;
-#endif
+	CC_DEBUG("Created window surface");
+}
+
+void CC_Vulkan::CreateGraphicsPipeline()
+{
+
 }
 
 void CC_Vulkan::PickPhysicalDevice()
@@ -281,7 +270,7 @@ void CC_Vulkan::PickPhysicalDevice()
 #if RUNMODE == 1
 	VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(myPhysicalDevice, &deviceProperties);
-	std::cout << "Picked physical device " << deviceProperties.deviceName << std::endl;
+	CC_DEBUG((std::string("Picked physical device ") +  std::string(deviceProperties.deviceName)).c_str());
 #endif
 }
 
@@ -292,504 +281,392 @@ bool CC_Vulkan::IsDeviceSuitable(VkPhysicalDevice aDevice)
     vkGetPhysicalDeviceProperties(aDevice, &deviceProperties);
     vkGetPhysicalDeviceFeatures(aDevice, &deviceFeatures);
 
-#if RUNMODE == 1
-	std::cout << "Checking physical device for features: " << deviceProperties.deviceName << std::endl;
-#endif
+	CC_DEBUG((std::string("Checking physical device for features: ") + std::string(deviceProperties.deviceName)).c_str());
 
 #ifdef VK_REQUIRE_FEATURE_ROBUST_BUFFER_ACCESS
 	if (!deviceFeatures.robustBufferAccess)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] robustBufferAccess" << std::endl;
-	#endif
+	CC_VK_DEBUG("robustBufferAccess");
 #endif
 #ifdef VK_REQUIRE_FEATURE_FULL_DRAW_INDEX_UINT_32
 	if(!deviceFeatures.fullDrawIndexUint32)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] fullDrawIndexUint32" << std::endl;
-	#endif
+	CC_VK_DEBUG("fullDrawIndexUint32");
 #endif
 #ifdef VK_REQUIRE_FEATURE_IMAGE_CUBE_ARRAY
 	if(!deviceFeatures.imageCubeArray)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] imageCubeArray" << std::endl;
-	#endif
+	CC_VK_DEBUG("imageCubeArray");
 #endif
 #ifdef VK_REQUIRE_FEATURE_INDEPENDENT_BLEND
 	if(!deviceFeatures.independentBlend)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] independentBlend" << std::endl;
-	#endif
+	CC_VK_DEBUG("independentBlend");
 #endif
 #ifdef VK_REQUIRE_FEATURE_GEOMETRY_SHADER
 	if(!deviceFeatures.geometryShader)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] geometryShader" << std::endl;
-	#endif
+	CC_VK_DEBUG("geometryShader");
 #endif
 #ifdef VK_REQUIRE_FEATURE_TESSELLATION_SHADER
 	if(!deviceFeatures.tessellationShader)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] tessellationShader" << std::endl;
-	#endif
+	CC_VK_DEBUG("tessellationShader");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SAMPLE_RATE_SHADING
 	if(!deviceFeatures.sampleRateShading)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sampleRateShading" << std::endl;
-	#endif
+	CC_VK_DEBUG("sampleRateShading");
 #endif
 #ifdef VK_REQUIRE_FEATURE_DUAL_SRC_BLEND
 	if(!deviceFeatures.dualSrcBlend)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] dualSrcBlend" << std::endl;
-	#endif
+	CC_VK_DEBUG("dualSrcBlend");
 #endif
 #ifdef VK_REQUIRE_FEATURE_LOGIC_OP
 	if(!deviceFeatures.logicOp)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] logicOp" << std::endl;
-	#endif
+	CC_VK_DEBUG("logicOp");
 #endif
 #ifdef VK_REQUIRE_FEATURE_MULTI_DRAW_INDIRECT
 	if(!deviceFeatures.multiDrawIndirect)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] multiDrawIndirect" << std::endl;
-	#endif
+	CC_VK_DEBUG("multiDrawIndirect");
 #endif
 #ifdef VK_REQUIRE_FEATURE_DRAW_INDIRECT_FIRST_INSTANCE
 	if(!deviceFeatures.drawIndirectFirstInstance)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] drawIndirectFirstInstance" << std::endl;
-	#endif
+	CC_VK_DEBUG("drawIndirectFirstInstance");
 #endif
 #ifdef VK_REQUIRE_FEATURE_DEPTH_CLAMP
 	if(!deviceFeatures.depthClamp)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] depthClamp" << std::endl;
-	#endif
+	CC_VK_DEBUG("depthClamp");
 #endif
 #ifdef VK_REQUIRE_FEATURE_DEPTH_BIAS_CLAMP
 	if(!deviceFeatures.depthBiasClamp)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] depthBiasClamp" << std::endl;
-	#endif
+	CC_VK_DEBUG("depthBiasClamp");
 #endif
 #ifdef VK_REQUIRE_FEATURE_FILL_MODE_NON_SOLID
 	if(!deviceFeatures.fillModeNonSolid)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] fillModeNonSolid" << std::endl;
-	#endif
+	CC_VK_DEBUG("fillModeNonSolid");
 #endif
 #ifdef VK_REQUIRE_FEATURE_DEPTH_BOUNDS
 	if(!deviceFeatures.depthBounds)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] depthBounds" << std::endl;
-	#endif
+	CC_VK_DEBUG("depthBounds");
 #endif
 #ifdef VK_REQUIRE_FEATURE_WIDE_LINES
 	if(!deviceFeatures.wideLines)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] wideLines" << std::endl;
-	#endif
+	CC_VK_DEBUG("wideLines");
 #endif
 #ifdef VK_REQUIRE_FEATURE_LARGE_POINTS
 	if(!deviceFeatures.largePoints)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] largePoints" << std::endl;
-	#endif
+	CC_VK_DEBUG("largePoints");
 #endif
 #ifdef VK_REQUIRE_FEATURE_ALPHA_TO_ONE
 	if(!deviceFeatures.alphaToOne)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] alphaToOne" << std::endl;
-	#endif
+	CC_VK_DEBUG("alphaToOne");
 #endif
 #ifdef VK_REQUIRE_FEATURE_MULTI_VIEWPORT
 	if(!deviceFeatures.multiViewport)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] multiViewport" << std::endl;
-	#endif
+	CC_VK_DEBUG("multiViewport");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SAMPLER_ANISOTROPY
 	if(!deviceFeatures.samplerAnisotropy)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] samplerAnisotropy" << std::endl;
-	#endif
+	CC_VK_DEBUG("samplerAnisotropy");
 #endif
 #ifdef VK_REQUIRE_FEATURE_TEXTURE_COMPRESSION_ETC2
 	if(!deviceFeatures.textureCompressionETC2)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] textureCompressionETC2" << std::endl;
-	#endif
+	CC_VK_DEBUG("textureCompressionETC2");
 #endif
 #ifdef VK_REQUIRE_FEATURE_TEXTURE_COMPRESSION_ASTC_LDR
 	if(!deviceFeatures.textureCompressionASTC_LDR)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] textureCompressionASTC_LDR" << std::endl;
-	#endif
+	CC_VK_DEBUG("textureCompressionASTC_LDR");
 #endif
 #ifdef VK_REQUIRE_FEATURE_TEXTURE_COMPRESSION_BC
 	if(!deviceFeatures.textureCompressionBC)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] textureCompressionBC" << std::endl;
-	#endif
+	CC_VK_DEBUG("textureCompressionBC");
 #endif
 #ifdef VK_REQUIRE_FEATURE_OCCLUSION_QUERY_PRECISE
 	if(!deviceFeatures.occlusionQueryPrecise)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] occlusionQueryPrecise" << std::endl;
-	#endif
+	CC_VK_DEBUG("occlusionQueryPrecise");
 #endif
 #ifdef VK_REQUIRE_FEATURE_PIPELINE_STATISTICS_QUERY
 	if(!deviceFeatures.pipelineStatisticsQuery)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] pipelineStatisticsQuery" << std::endl;
-	#endif
+	CC_VK_DEBUG("pipelineStatisticsQuery");
 #endif
 #ifdef VK_REQUIRE_FEATURE_VERTEX_PIPELINE_STORES_ANDATOMICS
 	if(!deviceFeatures.vertexPipelineStoresAndAtomics)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] vertexPipelineStoresAndAtomics" << std::endl;
-	#endif
+	CC_VK_DEBUG("vertexPipelineStoresAndAtomics");
 #endif
 #ifdef VK_REQUIRE_FEATURE_FRAGMENT_STORES_AND_ATOMICS
 	if(!deviceFeatures.fragmentStoresAndAtomics)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] fragmentStoresAndAtomics" << std::endl;
-	#endif
+	CC_VK_DEBUG("[ VkDebug ] fragmentStoresAndAtomics");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_TESSELLATION_AND_GEOMETRY_POINT_SIZE
 	if(!deviceFeatures.shaderTessellationAndGeometryPointSize)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderTessellationAndGeometryPointSize" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderTessellationAndGeometryPointSize");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_IMAGE_GATHER_EXTENDED
 	if(!deviceFeatures.shaderImageGatherExtended)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderImageGatherExtended" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderImageGatherExtended");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_STORAGE_IMAGE_EXTENDED_FORMATS
 	if(!deviceFeatures.shaderStorageImageExtendedFormats)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderStorageImageExtendedFormats" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderStorageImageExtendedFormats");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_STORAGE_IMAGE_MULTISAMPLE
 	if(!deviceFeatures.shaderStorageImageMultisample)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderStorageImageMultisample" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderStorageImageMultisample");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_STORAGE_IMAGE_READ_WITHOUT_FORMAT
 	if(!deviceFeatures.shaderStorageImageReadWithoutFormat)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderStorageImageReadWithoutFormat" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderStorageImageReadWithoutFormat");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_STORAGE_IMAGE_WRITE_WITHOUT_FORMAT
 	if(!deviceFeatures.shaderStorageImageWriteWithoutFormat)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderStorageImageWriteWithoutFormat" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderStorageImageWriteWithoutFormat");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_UNIFORM_BUFFER_ARRAY_DYNAMIC_INDEXING
 	if(!deviceFeatures.shaderUniformBufferArrayDynamicIndexing)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderUniformBufferArrayDynamicIndexing" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderUniformBufferArrayDynamicIndexing");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADERVSAMPLED_IMAGE_ARRAY_DYNAMIC_INDEXING
 	if(!deviceFeatures.shaderSampledImageArrayDynamicIndexing)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderSampledImageArrayDynamicIndexing" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderSampledImageArrayDynamicIndexing");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_STORAGE_BUFFER_ARRAY_DYNAMIC_INDEXING
 	if(!deviceFeatures.shaderStorageBufferArrayDynamicIndexing)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderStorageBufferArrayDynamicIndexing" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderStorageBufferArrayDynamicIndexing");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_STORAGE_IMAGE_ARRAY_DYNAMIC_INDEXING
 	if(!deviceFeatures.shaderStorageImageArrayDynamicIndexing)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderStorageImageArrayDynamicIndexing" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderStorageImageArrayDynamicIndexing");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_CLIP_DISTANCE
 	if(!deviceFeatures.shaderClipDistance)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderClipDistance" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderClipDistance");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_CULL_DISTANCE
 	if(!deviceFeatures.shaderCullDistance)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderCullDistance" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderCullDistance");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_FLOAT_64
 	if(!deviceFeatures.shaderFloat64)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderFloat64" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderFloat64");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_INT_64
 	if(!deviceFeatures.shaderInt64)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderInt64" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderInt64");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_INT_16
 	if(!deviceFeatures.shaderInt16)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderInt16" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderInt16");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_RESOURCE_RESIDENCY
 	if(!deviceFeatures.shaderResourceResidency)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderResourceResidency" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderResourceResidency");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SHADER_RESOURCE_MIN_LOD
 	if(!deviceFeatures.shaderResourceMinLod)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] shaderResourceMinLod" << std::endl;
-	#endif
+	CC_VK_DEBUG("shaderResourceMinLod");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_BINDING
 	if(!deviceFeatures.sparseBinding)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseBinding" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseBinding");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_RESIDENCY_BUFFER
 	if(!deviceFeatures.sparseResidencyBuffer)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseResidencyBuffer" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseResidencyBuffer");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_RESIDENCY_IMAGE_2D
 	if(!deviceFeatures.sparseResidencyImage2D)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseResidencyImage2D" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseResidencyImage2D");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_RESIDENCY_IMAGE_3D
 	if(!deviceFeatures.sparseResidencyImage3D)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseResidencyImage3D" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseResidencyImage3D");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_RESIDENCY_2_SAMPLES
 	if(!deviceFeatures.sparseResidency2Samples)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseResidency2Samples" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseResidency2Samples");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_RESIDENCY_4_SAMPLES
 	if(!deviceFeatures.sparseResidency4Samples)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseResidency4Samples" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseResidency4Samples");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_RESIDENCY_8_SAMPLES
 	if(!deviceFeatures.sparseResidency8Samples)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseResidency8Samples" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseResidency8Samples");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_RESIDENCY_16_SAMPLES
 	if(!deviceFeatures.sparseResidency16Samples)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseResidency16Samples" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseResidency16Samples");
 #endif
 #ifdef VK_REQUIRE_FEATURE_SPARSE_RESIDENCY_ALIASED
 	if(!deviceFeatures.sparseResidencyAliased)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] sparseResidencyAliased" << std::endl;
-	#endif
+	CC_VK_DEBUG("sparseResidencyAliased");
 #endif
 #ifdef VK_REQUIRE_FEATURE_VARIABLE_MULTISAMPLE_RATE
 	if(!deviceFeatures.variableMultisampleRate)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] variableMultisampleRate" << std::endl;
-	#endif
+	CC_VK_DEBUG("variableMultisampleRate");
 #endif
 #ifdef VK_REQUIRE_FEATURE_INHERITED_QUERIES
 	if(!deviceFeatures.inheritedQueries)
 	{
 		return false;
 	}
-	#ifdef VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] inheritedQueries" << std::endl;
-	#endif
+	CC_VK_DEBUG("inheritedQueries");
 #endif
 
 	QueueFamilyIndices indices = FindQueueFamilies(aDevice);
@@ -798,7 +675,7 @@ bool CC_Vulkan::IsDeviceSuitable(VkPhysicalDevice aDevice)
 		return false;
 	}
 #if VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] has graphics family and present family" << std::endl;
+	CC_VK_DEBUG("has graphics family and present family");
 #endif
 
 	if(!CheckDeviceExtensionSupport(aDevice))
@@ -806,7 +683,7 @@ bool CC_Vulkan::IsDeviceSuitable(VkPhysicalDevice aDevice)
 		return false;
 	}
 #if VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] supports required extensions" << std::endl;
+	CC_VK_DEBUG("supports required extensions");
 #endif
 
 	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(aDevice);
@@ -815,7 +692,7 @@ bool CC_Vulkan::IsDeviceSuitable(VkPhysicalDevice aDevice)
 		return false;
 	}
 #if VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] has swapchain support" << std::endl;
+	CC_VK_DEBUG("has swapchain support");
 #endif
 
 #ifdef VK_REQUIRE_DISCRETE_GPU
@@ -824,7 +701,7 @@ bool CC_Vulkan::IsDeviceSuitable(VkPhysicalDevice aDevice)
 		return false;
 	}
 	#if VK_DEBUG_FEATURES
-	std::cout << "[ VkDebug ] is discrete GPU" << std::endl;
+	CC_VK_DEBUG("is discrete GPU");
 	#endif
 #endif
 
@@ -978,7 +855,5 @@ void CC_Vulkan::Cleanup()
 	vkDestroySurfaceKHR(myVulkanInstance, mySurface, nullptr);
 	vkDestroyInstance(myVulkanInstance, nullptr);
 
-#if RUNMODE == 1
-	std::cout << "Vulkan cleanup complete" << std::endl;
-#endif
+	CC_STAT(CC_STAT_OK, "Vulkan cleanup complete");
 }

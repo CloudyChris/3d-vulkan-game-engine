@@ -37,6 +37,7 @@ private:
 	void CreateLogicalDevice();
 	void CreateSwapChain();
 	void CreateImageViews();
+  void CreateGraphicsPipeline();
 
 	// cleanup
 	void DestroyImageViews();

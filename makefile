@@ -6,7 +6,7 @@ build: src/main.cpp
 	    touch "./dist/clockmaker"; \
 	fi
 
-	clang++ src/*.cpp -o dist/clockmaker -DNDEBUG -v -ldl -lX11 -lvulkan -lGLU -lglut -lGLEW  -lglfw -lpthread -lpng -lXxf86vm -lXrandr -lXi -lstdc++fs -std=c++17
+	clang++ src/*.cpp -o dist/clockmaker -DNDEBUG -v -ldl -lX11 -lvulkan -lGL -lGLU -lglut -lGLEW  -lglfw -lpthread -lpng -lXxf86vm -lXrandr -lXi -lstdc++fs -std=c++17
 
 build-debug: src/main.cpp
 	if [ ! -d "./dist" ]; then \
@@ -16,7 +16,7 @@ build-debug: src/main.cpp
 	    touch "./dist/clockmaker"; \
 	fi
 
-	clang++ src/*.cpp -o dist/clockmaker -g -v -ldl -lX11 -lvulkan -lGLU -lglut -lGLEW  -lglfw -lpthread -lpng -lXxf86vm -lXrandr -lXi -lstdc++fs -std=c++17
+	clang++ src/*.cpp -o dist/clockmaker -g -v -ldl -lX11 -lvulkan -lGL -lGLU -lglut -lGLEW  -lglfw -lpthread -lpng -lXxf86vm -lXrandr -lXi -lstdc++fs -std=c++17
 
 build-vk-debug: src/main.cpp
 	if [ ! -d "./dist" ]; then \
@@ -26,7 +26,10 @@ build-vk-debug: src/main.cpp
 	    touch "./dist/clockmaker"; \
 	fi
 
-	clang++ src/*.cpp -o dist/clockmaker -g -DVK_DEBUG_FEATURES -v -ldl -lX11 -lvulkan -lGLU -lglut -lGLEW  -lglfw -lpthread -lpng -lXxf86vm -lXrandr -lXi -lstdc++fs -std=c++17
+	clang++ src/*.cpp -o dist/clockmaker -g -DVK_DEBUG_FEATURES -v -ldl -lX11 -lvulkan -lGL -lGLU -lglut -lGLEW  -lglfw -lpthread -lpng -lXxf86vm -lXrandr -lXi -lstdc++fs -std=c++17
+
+run: dist/clockmaker
+	./dist/clockmaker
 
 
 clean: dist/clockmaker

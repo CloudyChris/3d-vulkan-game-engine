@@ -17,8 +17,9 @@ void CC_WindowManager::InitWindow()
     }
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    myWindow = glfwCreateWindow(WIDTH, HEIGHT, CM_WIN_NAME, nullptr, nullptr);
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+  myWindow = glfwCreateWindow(WIDTH, HEIGHT, CM_WIN_NAME, nullptr, nullptr);
+
 	if( !myWindow )
 	{
         glfwTerminate();
@@ -48,7 +49,5 @@ void CC_WindowManager::Cleanup()
 	glfwDestroyWindow(myWindow);
     glfwTerminate();
 
-#if RUNMODE == 1
-	std::cout << "GLFW cleanup complete" << std::endl;
-#endif
+	CC_STAT(CC_STAT_OK, "GLFW cleanup complete");
 }
