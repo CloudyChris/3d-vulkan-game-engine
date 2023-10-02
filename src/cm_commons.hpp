@@ -36,6 +36,14 @@ __CC_STAT(Stat, Msg)
 
 #include <cassert>
 
+#pragma region VK_INCLUDES
+//[]=======================[]
+//||    VULKAN INCLUDES    ||
+//[]=======================[]
+#include <vulkan/vulkan.h>
+#include <shaderc/shaderc.hpp>
+#pragma endregion
+
 #pragma region STD_INCLUDES
 //[]=================================[]
 //||    STANDARD LIBRARY INCLUDES    ||
