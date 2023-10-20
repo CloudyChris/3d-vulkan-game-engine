@@ -64,8 +64,7 @@ std::vector<uint32_t> CC_ShaderCompiler::CompileFileToSpirVBin(const std::string
   // a shader registry. will also help with debugging
   if (optimize) options.SetOptimizationLevel(shaderc_optimization_level_size);
 
-  shaderc::SpvCompilationResult module =
-      compiler.CompileGlslToSpv(source, kind, source_name.c_str(), options);
+  shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, kind, source_name.c_str(), options);
 
   if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
     // TODO: consider soft asserting this or hard assert depening on the build (debug should hard assert)
