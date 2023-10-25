@@ -700,9 +700,9 @@ bool CC_Vulkan::IsDeviceSuitable(VkPhysicalDevice aDevice)
 	{
 		return false;
 	}
-	#if VK_DEBUG_FEATURES
+#if VK_DEBUG_FEATURES
 	CC_VK_DEBUG("is discrete GPU");
-	#endif
+#endif
 #endif
 
 	return true;
