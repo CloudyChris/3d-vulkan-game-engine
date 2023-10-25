@@ -103,7 +103,7 @@ inline void __CC_VK_DEBUG(const char* debug_msg)
 
 inline void __CC_Assert(const char* expr_str, bool expr, const char* file, int line, const char* msg)
 {
-    if (!expr)
+  if (!expr)
 	{
         std::cerr << "Assert failed:\t" << msg << "\n"
             << "Expected:\t" << expr_str << "\n"
